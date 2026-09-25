@@ -1,0 +1,42 @@
+tinhvan@TINY-PC:~/my_code/Doc_Sach_Y_Khoa/Utility_Python/1_Xoa_WaterMark$ python3 BUOC_2_Xoa_WaterMark_REDACT.py 
+🧹 BƯỚC 2 (v3): Xóa theo checksum bằng cách xóa lệnh vẽ trong content stream...
+
+  ❌ [Trang 1] Xóa 1 lượt lệnh vẽ '/QQAPIm825692ea Do'
+  ❌ [Trang 1] Xóa 1 lượt lệnh vẽ '/QQAPIm18f69fff Do'
+  ❌ [Trang 1] Xóa 1 lượt lệnh vẽ '/QQAPIm58006772 Do'
+  ❌ [Trang 3] Xóa 1 lượt lệnh vẽ '/QQAPIm825692ea Do'
+  ❌ [Trang 3] Xóa 1 lượt lệnh vẽ '/QQAPIm18f69fff Do'
+  ❌ [Trang 3] Xóa 1 lượt lệnh vẽ '/QQAPIm58006772 Do'
+  ❌ [Trang 6] Xóa 1 lượt lệnh vẽ '/QQAPIme8e4ec74 Do'
+  ❌ [Trang 6] Xóa 1 lượt lệnh vẽ '/QQAPIm3f56392f Do'
+
+✅ HOÀN TẤT BƯỚC 2!
+1. Tổng số lượt ảnh khớp checksum      : 70
+2. Tổng số lệnh vẽ đã xóa khỏi stream  : 8
+3. File PDF sạch đã lưu tại            : '/mnt/d/00000_Y_SI_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_NO_URL___111.pdf'
+4. Ảnh gốc lưu đối chứng tại           : '/mnt/d/00000_Y_SI_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/thu_muc_hinh_da_xoa'
+tinhvan@TINY-PC:~/my_code/Doc_Sach_Y_Khoa/Utility_Python/1_Xoa_WaterMark$ python3 BUOC_2_Xoa_WaterMark_REDACT_2.py 
+🧹 BƯỚC 2 (v4): Xóa theo checksum, quét cả trang lẫn Form XObject dùng chung...
+
+  ❌ [Trang 1 - content] Xóa 1 lượt '/QQAPIm825692ea Do'
+  ❌ [Trang 1 - content] Xóa 1 lượt '/QQAPIm18f69fff Do'
+  ❌ [Trang 1 - content] Xóa 1 lượt '/QQAPIm58006772 Do'
+  ❌ [Trang 3 - content] Xóa 1 lượt '/QQAPIm825692ea Do'
+  ❌ [Trang 3 - content] Xóa 1 lượt '/QQAPIm18f69fff Do'
+  ❌ [Trang 3 - content] Xóa 1 lượt '/QQAPIm58006772 Do'
+  ❌ [Trang 6 - content] Xóa 1 lượt '/QQAPIme8e4ec74 Do'
+  ❌ [Trang 6 - content] Xóa 1 lượt '/QQAPIm3f56392f Do'
+
+(Đã gom được 5 tên resource cần xóa trên toàn file)
+
+🔎 Đang quét toàn bộ object trong file để tìm Form XObject dùng chung...
+
+
+======================================================================
+Số Form XObject đã kiểm tra          : 5
+Số lượt ảnh khớp checksum (phát hiện) : 70
+Số lệnh vẽ xóa trong content stream    : 8
+Số lệnh vẽ xóa trong Form XObject       : 0
+TỔNG số lệnh vẽ đã xóa thật sự          : 8
+File PDF sạch                          : /mnt/d/00000_Y_SI_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_NO_URL___222.pdf
+======================================================================

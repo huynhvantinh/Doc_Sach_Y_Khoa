@@ -1,0 +1,5 @@
+1. $ cd "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH"
+
+2. $ mkdir -p "Grays_Anatomy_(Annas_Archive)_pages"
+
+3. $ pdfseparate "Grays_Anatomy_(Annas_Archive).pdf" "Grays_Anatomy_(Annas_Archive)_pages/page-%04d.pdf"
