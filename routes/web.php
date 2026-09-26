@@ -21,167 +21,116 @@ Route::get('/', function () {
 
 
 
-// ======================================================= Gemini:
-
-// 1. Route trả về trang xem sách
-Route::get('/read-book', function () {
-    // return "hello";
-    return view('pdf-viewer-gemini-2');
-});
-
-// 2. Route stream file PDF (Hardcode đường dẫn tuyệt đối)
-Route::get('/pdf-stream', function () {
-    // Đường dẫn tuyệt đối tới file PDF trên ổ D (WSL)
-    $filePath = '/mnt/d/00000_Y_SI_DA_KHOA/PDF_FOR_WEB/Grays_Anatomy.pdf';
-
-    if (!file_exists($filePath)) {
-        abort(404, 'Không tìm thấy file PDF tại đường dẫn chỉ định.');
-    }
-
-    $size = filesize($filePath);
-    $file = fopen($filePath, 'rb');
-
-    $headers = [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'inline; filename="book.pdf"',
-        'Accept-Ranges' => 'bytes',
-    ];
-
-    // Xử lý Byte-Range Request (Rất quan trọng cho file PDF dung lượng lớn)
-    if (request()->hasHeader('Range')) {
-        $range = request()->header('Range');
-        preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches);
-        
-        $start = intval($matches[1]);
-        $end = isset($matches[2]) && $matches[2] !== '' ? intval($matches[2]) : $size - 1;
-        $length = $end - $start + 1;
-
-        fseek($file, $start);
-
-        $headers['Content-Range'] = sprintf('bytes %d-%d/%d', $start, $end, $size);
-        $headers['Content-Length'] = $length;
-
-        return response()->stream(function () use ($file, $length) {
-            $buffer = 1024 * 8;
-            while (!feof($file) && $length > 0) {
-                $read = $length > $buffer ? $buffer : $length;
-                echo fread($file, $read);
-                flush();
-                $length -= $read;
-            }
-            fclose($file);
-        }, 206, $headers);
-    }
-
-    // Nếu trình duyệt yêu cầu tải toàn bộ file
-    $headers['Content-Length'] = $size;
-    return response()->stream(function () use ($file) {
-        fpassthru($file);
-        fclose($file);
-    }, 200, $headers);
-});
-
-
-// Route API nhận Request giải thích trang
-Route::post('/api/explain-page', function (Request $request) {
-    $page = $request->input('page');
-    $text = $request->input('text');
-
-    // Nếu trang PDF không trích xuất được chữ (ví dụ file scan ảnh), có thể thông báo lại
-    if (empty(trim($text))) {
-        return response()->json([
-            'explanation' => "Trang này không chứa dữ liệu văn bản dạng text (có thể là trang ảnh/sơ đồ thuần). Bác sĩ/Bạn có thể dùng tính năng gửi ảnh trang sang Gemini để phân tích hình ảnh."
-        ]);
-    }
-
-    // Đặt Gemini API Key của bạn vào file .env (GEMINI_API_KEY=your_key)
-    $apiKey = env('GEMINI_API_KEY', 'YOUR_API_KEY_HERE');
-
-    $prompt = "Bạn là một chuyên gia Giải phẫu học Y khoa. Hãy giúp tôi dịch và giải thích nội dung trang sách Gray's Anatomy dưới đây sang tiếng Việt dễ hiểu, giải thích rõ các thuật ngữ y học quan trọng:\n\n" . $text;
-
-    // Gọi Gemini API (Sử dụng model gemini-1.5-flash)
-    $response = Http::post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}", [
-        'contents' => [
-            [
-                'parts' => [
-                    ['text' => $prompt]
-                ]
-            ]
-        ]
-    ]);
-
-    if ($response->successful()) {
-        $result = $response->json();
-        $explanation = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Không nhận được phản hồi hợp lệ từ AI.';
-        
-        return response()->json([
-            'page' => $page,
-            'explanation' => $explanation
-        ]);
-    }
-
-    return response()->json([
-        'explanation' => 'Lỗi kết nối tới Gemini API: ' . $response->body()
-    ], 500);
-});
-
-
-
-
 // ======================================================= Claude:
-// ======================================================= Claude:
-// ======================================================= Claude:
-// Route trả file PDF thô
-Route::get('/pdf-raw/grays-anatomy', function () {
-    $path = '/mnt/d/00000_Y_SI_DA_KHOA/PDF_FOR_WEB/Grays_Anatomy.pdf';
 
-    if (!file_exists($path)) {
-        abort(404, 'Không tìm thấy file PDF tại: ' . $path);
+/*
+|--------------------------------------------------------------------------
+| Cấu hình đường dẫn cứng - sửa ở đây nếu chuyển sách/đường dẫn khác
+|--------------------------------------------------------------------------
+*/
+$graysAnatomyDir = '/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_pages';
+
+/*
+|--------------------------------------------------------------------------
+| Trang xem sách
+|--------------------------------------------------------------------------
+*/
+Route::get('/sach/grays-anatomy', function () use ($graysAnatomyDir) {
+
+    if (!is_dir($graysAnatomyDir)) {
+        abort(404, "Không tìm thấy thư mục trang đã tách: {$graysAnatomyDir}");
     }
 
-    return response()->file($path, [
-        'Content-Type'        => 'application/pdf',
-        'Content-Disposition' => 'inline; filename="Grays_Anatomy.pdf"',
-    ]);
-})->name('pdf.grays-anatomy.raw');
+    $files = glob($graysAnatomyDir . '/page-*.pdf');
+    natsort($files);
+    $totalPages = count($files);
 
-// Route hiển thị view chứa PDF
-Route::get('/sach/grays-anatomy', function () {
-    return view('pdf-viewer-claude', [
-        'pdfUrl' => route('pdf.grays-anatomy.raw'),
-        'title'  => "Gray's Anatomy",
+    if ($totalPages === 0) {
+        abort(404, 'Thư mục không có file trang nào (page-XXXX.pdf). Chạy pdfseparate trước.');
+    }
+
+    // Lấy tỉ lệ khung trang (height / width) từ trang đầu tiên bằng pdfinfo,
+    // dùng để dựng khung placeholder đúng tỉ lệ khi cuộn liên tục (tránh giật layout)
+    $firstPage = reset($files);
+    $aspectRatio = 1.414; // fallback: tỉ lệ A4 dọc
+    $info = @shell_exec('pdfinfo ' . escapeshellarg($firstPage) . ' 2>/dev/null');
+    if ($info && preg_match('/Page size:\s*([\d.]+)\s*x\s*([\d.]+)/', $info, $m)) {
+        $w = (float) $m[1];
+        $h = (float) $m[2];
+        if ($w > 0) {
+            $aspectRatio = $h / $w;
+        }
+    }
+
+    $viewer = 'pdf-viewer-1';
+    $viewer = 'pdf-viewer-2'; //Có div bao bọc qaunh embed, chưa OK lắm
+    $viewer = 'pdf-viewer-3'; //OK hơn 2
+    $viewer = 'pdf-viewer-5';
+    $viewer = 'pdf-viewer-6';
+    return view($viewer, [
+        'title'       => "Gray's Anatomy",
+        'totalPages'  => $totalPages,
+        'aspectRatio' => round($aspectRatio, 4),
+        'pageUrlBase' => url('/pdf-raw/grays-anatomy'),
     ]);
 })->name('pdf.grays-anatomy');
 
 
 
+/*
+|--------------------------------------------------------------------------
+| File PDF của từng trang riêng lẻ (đã tách bằng pdfseparate)
+|--------------------------------------------------------------------------
+*/
+Route::get('/pdf-raw/grays-anatomy/{page}', function ($page) use ($graysAnatomyDir) {
+    $page = (int) $page;
+    $filename = sprintf('page-%04d.pdf', $page);
+    $path = $graysAnatomyDir . '/' . $filename;
 
-// ///////////////////////////////
-// File PDF thô
-Route::get('/pdf-raw/grays-anatomy', function () {
-    $path = '/mnt/d/00000_Y_SI_DA_KHOA/PDF_FOR_WEB/Grays_Anatomy.pdf';
     if (!file_exists($path)) {
-        abort(404, 'Không tìm thấy file PDF tại: ' . $path);
+        abort(404, "Không tìm thấy trang {$page}: {$filename}");
     }
+
     return response()->file($path, [
         'Content-Type'        => 'application/pdf',
-        'Content-Disposition' => 'inline; filename="Grays_Anatomy.pdf"',
+        'Content-Disposition' => 'inline; filename="' . $filename . '"',
     ]);
-})->name('pdf.grays-anatomy.raw');
+})->where('page', '[0-9]+')->name('pdf.grays-anatomy.page');
 
-// Trang viewer
-Route::get('/sach/grays-anatomy', function () {
-    return view('pdf-viewer-claude-5', [
-        'pdfUrl' => route('pdf.grays-anatomy.raw'),
-        'title'  => "Gray's Anatomy",
-    ]);
-})->name('pdf.grays-anatomy');
 
-// API: dịch nội dung 1 trang
-Route::post('/api/pdf/translate', function (Request $request) {
-    $text = trim($request->input('text', ''));
+
+/*
+|--------------------------------------------------------------------------
+| Hàm dùng chung cho API: trích text từ 1 trang PDF bằng pdftotext (server-side)
+|--------------------------------------------------------------------------
+*/
+function extractPageText(string $path): string
+{
+    // -layout: cố giữ bố cục gốc (giúp đỡ lẫn 2 cột Anh-Việt hơn so với mặc định)
+    $cmd = 'pdftotext -layout ' . escapeshellarg($path) . ' - 2>/dev/null';
+    return trim((string) shell_exec($cmd));
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| API: Dịch nội dung 1 trang
+|--------------------------------------------------------------------------
+*/
+Route::post('/api/pdf/translate', function (Request $request) use ($graysAnatomyDir) {
+    $page = (int) $request->input('page');
+    $filename = sprintf('page-%04d.pdf', $page);
+    $path = $graysAnatomyDir . '/' . $filename;
+
+    if (!file_exists($path)) {
+        return response()->json(['error' => "Không tìm thấy trang {$page}"], 404);
+    }
+
+    $text = extractPageText($path);
     if ($text === '') {
-        return response()->json(['error' => 'Không có nội dung để dịch'], 422);
+        return response()->json([
+            'error' => 'Không trích được text từ trang này (có thể là trang scan ảnh, không có text layer).',
+        ], 422);
     }
 
     $response = Http::timeout(60)->withHeaders([
@@ -193,7 +142,7 @@ Route::post('/api/pdf/translate', function (Request $request) {
         'max_tokens' => 2000,
         'messages'   => [[
             'role'    => 'user',
-            'content' => "Dịch đoạn văn y khoa sau sang tiếng Việt, giữ nguyên thuật ngữ giải phẫu chính xác, trình bày rõ ràng:\n\n{$text}",
+            'content' => "Dịch đoạn văn y khoa sau sang tiếng Việt, giữ nguyên thuật ngữ giải phẫu chính xác, trình bày rõ ràng, mạch lạc:\n\n{$text}",
         ]],
     ]);
 
@@ -206,11 +155,27 @@ Route::post('/api/pdf/translate', function (Request $request) {
     ]);
 })->name('api.pdf.translate');
 
-// API: tạo bài giảng từ nội dung trang
-Route::post('/api/pdf/lecture', function (Request $request) {
-    $text = trim($request->input('text', ''));
+
+
+/*
+|--------------------------------------------------------------------------
+| API: Tạo bài giảng từ nội dung 1 trang
+|--------------------------------------------------------------------------
+*/
+Route::post('/api/pdf/lecture', function (Request $request) use ($graysAnatomyDir) {
+    $page = (int) $request->input('page');
+    $filename = sprintf('page-%04d.pdf', $page);
+    $path = $graysAnatomyDir . '/' . $filename;
+
+    if (!file_exists($path)) {
+        return response()->json(['error' => "Không tìm thấy trang {$page}"], 404);
+    }
+
+    $text = extractPageText($path);
     if ($text === '') {
-        return response()->json(['error' => 'Không có nội dung'], 422);
+        return response()->json([
+            'error' => 'Không trích được text từ trang này (có thể là trang scan ảnh, không có text layer).',
+        ], 422);
     }
 
     $response = Http::timeout(90)->withHeaders([

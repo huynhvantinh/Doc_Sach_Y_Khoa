@@ -32,7 +32,13 @@ def export_pdf_to_json(input_pdf_path, output_json_path):
     print(f"Đã xuất toàn bộ dữ liệu ra file: {output_json_path}")
 
 # --- CHẠY THỬ NGHỆM ---
-input_file = "/mnt/d/00000_Y_SI_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.pdf"
-output_json = "/mnt/d/00000_Y_SI_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266_data.json"
+input_pdf   = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.pdf"
+output_json = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.json"
+input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.pdf"
+output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.json"
+input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/zpage-0294.pdf"
+output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/zpage-0294.json"
+# input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_TEST_p293.pdf"
+# output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_TEST_p293.json"
 
-export_pdf_to_json(input_file, output_json)
+export_pdf_to_json(input_pdf, output_json)
