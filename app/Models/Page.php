@@ -15,14 +15,19 @@ class Page extends Model
         'response_json' => 'array',
     ];
 
-    public function lectures()
-    {
-        return $this->hasMany(Lecture::class)->latest();
+    public function book() {
+        return $this->belongsTo(Book::class);
     }
 
-    // lấy bài giảng mới nhất để hiển thị mặc định
+    // Danh sách tất cả bài giảng của trang
+    public function lectures() {
+        return $this->hasMany(Lecture::class);
+    }
+
+    // Lấy bài giảng mới nhất để hiển thị mặc định
     public function latestLecture()
     {
         return $this->hasOne(Lecture::class)->latestOfMany();
     }
+
 }

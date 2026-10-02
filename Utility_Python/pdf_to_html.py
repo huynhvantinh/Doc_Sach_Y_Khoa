@@ -1,7 +1,7 @@
 import fitz  # pip install PyMuPDF
 
 
-input_pdf = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0027.pdf" ##D:\00000_Y_DA_KHOA\SACH_PDF_FOR_WEB_DOC_SACH
+input_pdf = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0140.pdf" ##D:\00000_Y_DA_KHOA\SACH_PDF_FOR_WEB_DOC_SACH
 output_pdf = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/out.html"
 doc = fitz.open(input_pdf)
 html_parts = []

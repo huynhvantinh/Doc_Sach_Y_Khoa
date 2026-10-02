@@ -1,8 +1,53 @@
 import os
 import fitz
 
-INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive).pdf"
-OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_pages"
+# Sách 1
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/1_Grays_Anatomy_Students.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/1_Grays_Anatomy_Students_pages"
+
+# Sách 2
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/2_Grays_Anatomy_Clinical_Practice.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/2_Grays_Anatomy_Clinical_Practice_pages"
+
+# Sách 3
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/3_Moores_Clinically_Anatomy.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/3_Moores_Clinically_Anatomy_pages"
+
+# Sách 4
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/4_Junqueiras_Histology.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/4_Junqueiras_Histology_pages"
+
+# Sách 5 - KHÔNG OK - vì SVG vẫn còn dính text
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/5_Histology.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/5_Histology_pages"
+
+# Sách 6
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/6_Histology_Abraham.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/6_Histology_Abraham_pages"
+
+# Sách 7
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/7_Guyton.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/7_Guyton_pages"
+
+# Sách 8 - KHÔNG OK - vì SVG vẫn còn dính text
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/8_Pathophysiology.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/8_Pathophysiology_pages"
+
+# Sách 9
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/9_Robbins_Cotran_Pathologic.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/9_Robbins_Cotran_Pathologic_pages"
+
+# Sách 10 - KHÔNG OK - vì SVG vẫn còn dính text
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/10_Histology_7th.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/10_Histology_7th_pages"
+
+# Sách 11 - OK - Trong danh sách các sách Histoloy A Text And Atlas thì sách 11 và 12 là OK vì lưu SVG không có text được
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/11_Histology_6th.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/11_Histology_6th_pages"
+
+# Sách 12 - OK - Trong danh sách các sách Histoloy A Text And Atlas thì sách 11 và 12 là OK vì lưu SVG không có text được
+INPUT_PDF = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/12_Histology_7th.pdf"
+OUTPUT_DIR = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/12_Histology_7th_pages"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

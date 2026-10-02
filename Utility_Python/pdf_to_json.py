@@ -14,6 +14,7 @@ def export_pdf_to_json(input_pdf_path, output_json_path):
         
         # 2. Lấy thêm thông tin vị trí các Hình ảnh (Images) trên trang
         image_list = page.get_image_info(hashes=False)
+        image_list = page.get_image_info(xrefs=True, hashes=False)
 
         page_info = {
             "page_number": page_num + 1,
@@ -24,6 +25,8 @@ def export_pdf_to_json(input_pdf_path, output_json_path):
         }
         
         pdf_data.append(page_info)
+        # pdf_data.append(page_dict) #test
+        # pdf_data.append(image_list) #test
 
     # 3. Ghi ra file JSON (định dạng đẹp với indent=2)
     with open(output_json_path, "w", encoding="utf-8") as f:
@@ -32,12 +35,17 @@ def export_pdf_to_json(input_pdf_path, output_json_path):
     print(f"Đã xuất toàn bộ dữ liệu ra file: {output_json_path}")
 
 # --- CHẠY THỬ NGHỆM ---
-input_pdf   = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.pdf"
-output_json = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.json"
-input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.pdf"
-output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.json"
-input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/zpage-0294.pdf"
-output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/zpage-0294.json"
+# input_pdf   = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.pdf"
+# output_json = "/mnt/d/00000_Y_DA_KHOA/Python_For_Guyton/Gray_Anatomy_p266.json"
+# input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.pdf"
+# output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0293.json"
+# input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0294.pdf"
+# output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0294_3.json"
+
+input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0001.pdf"
+output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0001.json"
+# input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0011.pdf"
+# output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/page-0011.json"
 # input_pdf   = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_TEST_p293.pdf"
 # output_json = "/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/Grays_Anatomy_(Annas_Archive)_TEST_p293.json"
 

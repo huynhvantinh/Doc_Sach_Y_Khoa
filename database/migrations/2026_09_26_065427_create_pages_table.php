@@ -18,8 +18,8 @@ return new class extends Migration
             $table->unsignedInteger('page_number'); // Số trang trong sách (1-based)
 
             $table->json('raw_json')->nullable();
-            $table->json('processed_json')->nullable();
-            $table->json('response_json')->nullable();
+            $table->json('send_api_json')->nullable();
+            $table->json('response_api_json')->nullable();
  
             // Trạng thái xử lý - để quản lý tiến độ 1299 trang, hỗ trợ resume khi lỗi
             $table->enum('status', [

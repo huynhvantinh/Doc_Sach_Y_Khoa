@@ -212,47 +212,77 @@ Route::post('/api/pdf/lecture', function (Request $request) use ($graysAnatomyDi
 
 // ///////////////////////////////////////// TEST
  
+/*
+|--------------------------------------------------------------------------
+| Route xem thử: tái hiện lại 1 trang từ raw_json bằng HTML (để kiểm tra
+| dữ liệu trích xuất đã đầy đủ chưa, trước khi thật sự gọi API dịch).
+|--------------------------------------------------------------------------
+*/
 Route::get('/sach/grays-anatomy/debug/{page}', function ($page) {
-    $bookSlug = 'test-tong-hop';
-
+    // $bookSlug = 'grays-anatomy-4th'; // TODO: sửa cho khớp đúng slug đang dùng ở file 2/file 3 Python
+    $bookSlug = 'test-tong-hop'; // TODO: sửa cho khớp đúng slug đang dùng ở file 2/file 3 Python
+ 
     $book = DB::table('books')->where('slug', $bookSlug)->first();
     if (!$book) {
-        abort(404, "Không tìm thấy sách với slug='{$bookSlug}'.");
+        abort(404, "Không tìm thấy sách với slug='{$bookSlug}'. Kiểm tra lại đã chạy file 1 (Python) chưa.");
     }
-
+ 
     $row = DB::table('pages')
         ->where('book_id', $book->id)
         ->where('page_number', (int) $page)
         ->first();
-
-    if (!$row)           abort(404, "Chưa có record cho trang {$page}.");
-    if (!$row->raw_json) abort(404, "Trang {$page} chưa có raw_json.");
-
+ 
+    if (!$row) {
+        abort(404, "Chưa có record cho trang {$page} trong bảng pages.");
+    }
+    if (!$row->raw_json) {
+        abort(404, "Trang {$page} chưa có raw_json (chưa chạy file 2 Python cho trang này).");
+    }
+ 
     $raw = json_decode($row->raw_json, true);
-    if ($raw === null)   abort(500, "raw_json của trang {$page} bị lỗi.");
-
-    $pageData = PdfPageHelper::buildPageRenderData($raw, 900);   // hoặc 'block'
-
+    if ($raw === null) {
+        abort(500, "raw_json của trang {$page} bị lỗi, không parse được JSON.");
+    }
+ 
+    // $pageData = buildPageRenderData($raw, 900); // 900px chiều rộng khung hiển thị
+    $pageData = PdfPageHelper::buildPageRenderData($raw, 900);                  // mặc định: 'line'
+    // $pageData = PdfPageHelper::buildPageRenderData($raw, 900, 'block');         // thử cách block
+    // $pageData = PdfPageHelper::buildPageRenderData($raw, 900, 'line', ['highlight_from_fill' => false,]); // test tắt nguồn fill
+ 
     return view('pdf-page-debug', [
-        'pageNumber' => (int) $page,
-        'pageData'   => $pageData,
-        'svgUrl'     => url("/svg-raw/grays-anatomy/{$page}"),
+        'pageNumber'   => (int) $page,
+        'pageData'     => $pageData,
+        'imageUrlBase' => url("/images-raw/grays-anatomy/{$page}"),
     ]);
 })->where('page', '[0-9]+')->name('debug.pdf.page');
-
-
-/* Phục vụ SVG nền (nằm ngoài public nên phải qua route) */
-Route::get('/svg-raw/grays-anatomy/{page}', function ($page) {
-    $svgsDir = '/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/0_Test_Tong_Hop_svgs';
-    $path = sprintf('%s/page-%04d.svg', $svgsDir, (int) $page);
-
-    if (!is_file($path)) {
-        abort(404, "Không tìm thấy SVG của trang {$page}");
+ 
+ 
+/*
+|--------------------------------------------------------------------------
+| Route phục vụ ảnh đã trích ra từ file 2 (nằm ngoài thư mục public, nên
+| không thể trỏ trực tiếp - phải qua route riêng để đọc và trả về file).
+|--------------------------------------------------------------------------
+*/
+Route::get('/images-raw/grays-anatomy/{page}/{number}', function ($page, $number) {
+    // $imagesDir = '/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/1_Grays_Anatomy_Students_imagesP';
+    $imagesDir = '/mnt/d/00000_Y_DA_KHOA/SACH_PDF_FOR_WEB_DOC_SACH/0_Test_Tong_Hop_images';
+ 
+    $pattern = sprintf('%s/page-%04d_img%s.*', $imagesDir, (int) $page, $number);
+    $matches = glob($pattern);
+ 
+    if (empty($matches)) {
+        abort(404, "Không tìm thấy ảnh: page={$page}, number={$number}");
     }
-
-    return response()->file($path, [
-        'Content-Type'  => 'image/svg+xml',
-        'Cache-Control' => 'public, max-age=86400',
-    ]);
-})->where('page', '[0-9]+')->name('svg.raw.grays-anatomy');
+ 
+    $path = $matches[0];
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mime = match ($ext) {
+        'jpeg', 'jpg' => 'image/jpeg',
+        'png'         => 'image/png',
+        'jp2', 'jpx'  => 'image/jp2',
+        default       => 'application/octet-stream',
+    };
+ 
+    return response()->file($path, ['Content-Type' => $mime]);
+})->where(['page' => '[0-9]+', 'number' => '[0-9]+'])->name('images.raw.grays-anatomy');
  
